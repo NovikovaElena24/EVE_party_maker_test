@@ -1,12 +1,12 @@
 import streamlit as st
 from streamlit_javascript import st_javascript
-import streamlit.components.v1 as components
-import requests
 import json
+import requests
 
 st.set_page_config(page_title="Календарь мероприятий", layout="centered", initial_sidebar_state="collapsed")
 st.title("Календарь мероприятий")
 
+# 🧠 Получаем initData как сериализованный JSON
 init_data_raw = st_javascript(
     """
     () => {
@@ -28,22 +28,22 @@ init_data_raw = st_javascript(
     """
 )
 
-st.write("init_data_raw:", init_data_raw)
+# 🔍 Отладка
+st.subheader("init_data_raw:")
+st.write(init_data_raw)
 
-if isinstance(init_data_raw, str):
-    try:
-        init_data = json.loads(init_data_raw)
-    except Exception as e:
-        st.error(f"Ошибка парсинга initData: {e}")
-        init_data = {}
-else:
-    st.error(f"init_data_raw не является строкой: {init_data_raw}")
+# 🧪 Парсим JSON
+try:
+    init_data = json.loads(init_data_raw)
+except Exception as e:
+    st.error(f"Ошибка парсинга initData: {e}")
     init_data = {}
 
-st.subheader("Debug Info")
+# ⬇️ Отображаем разобранный словарь
+st.subheader("Parsed initData")
 st.json(init_data)
 
-# Вызываем проверку подписи, если initData корректен
+# 🔒 Проверка подписи, если initData валиден
 if isinstance(init_data, dict) and init_data.get("initData") not in ["", "EMPTY_INIT_DATA"]:
     response = requests.post("https://87da-37-150-246-43.ngrok-free.app/verify", json={"initData": init_data["initData"]})
     result = response.json()
